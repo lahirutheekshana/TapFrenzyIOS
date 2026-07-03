@@ -1,13 +1,13 @@
 import Foundation
 
-// API එකෙන් එන මුළු Response එක
+
 struct QuizResponse: Codable {
     let results: [Question]
 }
 
-// තනි ප්‍රශ්නයක ව්‍යුහය (HTML Entity decoding ද ඇතුළත් කර ඇත)
+
 struct Question: Codable, Identifiable {
-    var id: String { question } // Identifiable සඳහා question එකම id එක ලෙස ගනී
+    var id: String { question }
     let question: String
     let correctAnswer: String
     let incorrectAnswers: [String]
@@ -17,13 +17,12 @@ struct Question: Codable, Identifiable {
         case correctAnswer = "correct_answer"
         case incorrectAnswers = "incorrect_answers"
     }
-   
-    // ප්‍රශ්න සහ උත්තර වල තියෙන " &quot; වගේ HTML කේත සාමාන්‍ය අකුරු බවට පත් කරන ශ්‍රිතය
+
     var decodedQuestion: String {
         return question.htmlDecoded
     }
    
-    // නිවැරදි සහ වැරදි උත්තර 4ම එකතු කරලා ෂෆල් (Shuffle) කර ලබා දෙන ශ්‍රිතය
+   
     var allAnswers: [String] {
         var answers = incorrectAnswers.map { $0.htmlDecoded }
         answers.append(correctAnswer.htmlDecoded)
@@ -31,15 +30,14 @@ struct Question: Codable, Identifiable {
     }
 }
 
-// HTML Entities decode කිරීමට වේගවත් Helper Extension එකක්
-// (NSAttributedString + WebKit HTML parsing එක ඉවත් කර, සරල string replace එකකින් instant decode කරයි)
+
 extension String {
     var htmlDecoded: String {
         guard self.contains("&") else { return self }
         
         var decoded = self
         
-        // OpenTDB responses වල බහුලව එන Named HTML entities
+        
         let namedEntities: [String: String] = [
             "&quot;": "\"", "&#039;": "'", "&apos;": "'", "&amp;": "&",
             "&lt;": "<", "&gt;": ">", "&nbsp;": " ",
@@ -58,7 +56,7 @@ extension String {
             decoded = decoded.replacingOccurrences(of: entity, with: character)
         }
         
-        // Numeric entities: &#039; (decimal) සහ &#x27; (hex) වගේ ඒවා
+        
         if decoded.contains("&#") {
             decoded = decoded.decodedNumericEntities()
         }
