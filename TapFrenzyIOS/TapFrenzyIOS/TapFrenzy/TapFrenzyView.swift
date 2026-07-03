@@ -2,21 +2,20 @@ import SwiftUI
 import Combine
 
 struct TapFrenzyView: View {
-    // Game States
+    
     @State private var score = 0
     @State private var timeRemaining = 10
     @State private var isGameActive = false
     @State private var isGameOver = false
    
-    // Challenges Variables (Combo System & Shrinking Effect)
+    
     @State private var comboMultiplier = 1
     @State private var lastTapTime = Date()
     @State private var buttonScale: CGFloat = 1.0
    
-    // Persist High Score using @AppStorage
-    @AppStorage("tapFrenzyHighScore") private var highScore = 0
+        @AppStorage("tapFrenzyHighScore") private var highScore = 0
    
-    // Timer setting
+
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
    
     var body: some View {
@@ -117,7 +116,7 @@ struct TapFrenzyView: View {
                             .fontWeight(.bold)
                        
                         if score > highScore {
-                            Text("🎉 New High Score! 🎉")
+                            Text("New High Score! ")
                                 .font(.headline)
                                 .foregroundColor(.green)
                                 .transition(.scale)
@@ -162,7 +161,7 @@ struct TapFrenzyView: View {
                             }
                         }
                     }
-                    // Time එක ඉවර වෙන්න ළඟ වෙද්දී බටන් එක කුඩා වෙනවා (Shrinking Button Challenge)
+                   
                     .scaleEffect(buttonScale)
                     .animation(.spring(response: 0.3, dampingFraction: 0.5), value: buttonScale)
                 }
@@ -179,9 +178,9 @@ struct TapFrenzyView: View {
             if timeRemaining > 0 {
                 timeRemaining -= 1
                
-                // Challenge 2: කාලය අඩු වෙද්දී බටන් එකේ සයිස් එක ක්‍රමයෙන් කුඩා කිරීම
+               
                 withAnimation {
-                    buttonScale = CGFloat(timeRemaining) / 10.0 * 0.4 + 0.6 // 1.0 සිට 0.6 දක්වා shrink වේ
+                    buttonScale = CGFloat(timeRemaining) / 10.0 * 0.4 + 0.6
                 }
             } else {
                 // Time Up
@@ -193,7 +192,7 @@ struct TapFrenzyView: View {
    
     // --- GAME LOGIC FUNCTIONS ---
    
-    // Game එක පටන් ගන්නා විට
+    
     func startGame() {
         score = 0
         timeRemaining = 10
@@ -204,24 +203,23 @@ struct TapFrenzyView: View {
         lastTapTime = Date()
     }
    
-    // Button එක Tap කරන සෑම විටම
+
     func handleTap() {
         let now = Date()
         let timeInterval = now.timeIntervalSince(lastTapTime)
        
-        // Challenge 1: Combo System (තත්පර 0.5ක් ඇතුළත නැවත Tap කලොත් Multiplier එක වැඩි වේ)
         if timeInterval < 0.5 {
-            if comboMultiplier < 5 { // උපරිම x5 වෙනකම් combo ලැබෙනවා
+            if comboMultiplier < 5 {
                 comboMultiplier += 1
             }
         } else {
-            comboMultiplier = 1 // පරක්කු වුනොත් Combo එක reset වෙනවා
+            comboMultiplier = 1
         }
        
         score += comboMultiplier
         lastTapTime = now
        
-        // Tap කරන විට පොඩි bounce animation එකක්
+        
         withAnimation(.easeInOut) {
             buttonScale -= 0.05
             
@@ -231,7 +229,7 @@ struct TapFrenzyView: View {
         }
     }
    
-    // High score එක update කිරීම
+    
     func updateHighScore() {
         if score > highScore {
             highScore = score

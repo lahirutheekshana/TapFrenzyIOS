@@ -2,26 +2,26 @@ import SwiftUI
 import Combine
 
 struct LightItUpView: View {
-    // Game States
+    
     @State private var cards: [Card] = []
     @State private var score = 0
-    @State private var lives = 3 // Bonus Feature: 3 Lives System
+    @State private var lives = 3
     @State private var currentLevel: GameLevel = .L1
     @State private var roundTimeRemaining = 60
     @State private var isGameActive = false
     @State private var isGameOver = false
    
-    // Visual Effects
-    @State private var showLevelUpFlash = false // Bonus Feature: Level up flash overlay
    
-    // Persist High Score per mode
+    @State private var showLevelUpFlash = false
+   
+    
     @AppStorage("lightItUpHighScore") private var highScore = 0
    
-    // Timers
+    
     let gameTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var litTimer: Timer? = nil
    
-    // Grid Setup Layout Columns
+    
     var columns: [GridItem] {
         switch currentLevel {
         case .L1, .L2:
@@ -33,12 +33,12 @@ struct LightItUpView: View {
    
     var body: some View {
         ZStack {
-            // Background Color
+            
             Color(.systemGroupedBackground)
                 .ignoresSafeArea()
            
             VStack(spacing: 20) {
-                // Game Info Top Bar (Score, Level, High Score)
+            
                 HStack {
                     VStack(alignment: .leading) {
                         Text("SCORE: \(score)")
@@ -46,7 +46,7 @@ struct LightItUpView: View {
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
                        
-                        Text("⭐ HIGH: \(highScore)")
+                        Text("HIGH: \(highScore)")
                             .font(.caption)
                             .fontWeight(.semibold)
                             .foregroundColor(.secondary)
@@ -54,7 +54,7 @@ struct LightItUpView: View {
                    
                     Spacer()
                    
-                    // Level Badge
+                    
                     Text("LEVEL \(currentLevel.rawValue)")
                         .font(.headline)
                         .padding(.horizontal, 15)
@@ -65,14 +65,14 @@ struct LightItUpView: View {
                    
                     Spacer()
                    
-                    // Timer & Lives
+                    
                     VStack(alignment: .trailing) {
                         Text("⏱️ \(roundTimeRemaining)s")
                             .font(.title3)
                             .fontWeight(.bold)
                             .foregroundColor(roundTimeRemaining <= 10 ? .red : .primary)
                        
-                        // Hearts for Lives Display
+                        
                         HStack(spacing: 3) {
                             ForEach(0..<3) { index in
                                 Image(systemName: index < lives ? "heart.fill" : "heart")
@@ -106,7 +106,7 @@ struct LightItUpView: View {
                 } else if isGameOver {
                     // Game Over Screen
                     VStack(spacing: 15) {
-                        Text("GAME OVER 🕹️")
+                        Text("GAME OVER ")
                             .font(.title)
                             .fontWeight(.black)
                             .foregroundColor(.red)
@@ -116,7 +116,7 @@ struct LightItUpView: View {
                             .fontWeight(.semibold)
                        
                         if score > highScore {
-                            Text("👑 NEW HIGH SCORE! 👑")
+                            Text(" NEW HIGH SCORE! ")
                                 .font(.headline)
                                 .foregroundColor(.green)
                         }
@@ -137,7 +137,7 @@ struct LightItUpView: View {
                     .cornerRadius(20)
                     .shadow(radius: 10)
                 } else {
-                    // Game Active View: Cards Grid
+                
                     LazyVGrid(columns: columns, spacing: 15) {
                         ForEach(0..<cards.count, id: \.self) { index in
                             let card = cards[index]
@@ -145,7 +145,7 @@ struct LightItUpView: View {
                             RoundedRectangle(cornerRadius: 15)
                                 .fill(card.isLit ? currentLevel.glowColor.gradient : Color(.tertiarySystemGroupedBackground).gradient)
                                 .frame(height: 100)
-                                // Bonus Feature: Scale-up animation & shadow when lit
+                                
                                 .scaleEffect(card.isLit ? 1.05 : 1.0)
                                 .shadow(color: card.isLit ? currentLevel.glowColor.opacity(0.6) : .clear, radius: card.isLit ? 12 : 0)
                                 .overlay(
@@ -165,7 +165,7 @@ struct LightItUpView: View {
                 Spacer()
             }
            
-            // Bonus Feature: Level Up White Flash Overlay
+            
             if showLevelUpFlash {
                 Color.white
                     .ignoresSafeArea()
@@ -176,7 +176,6 @@ struct LightItUpView: View {
         .navigationTitle("Light It Up")
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear { stopLitTimer() }
-        // Game Countdown Logic
         .onReceive(gameTimer) { _ in
             guard isGameActive else { return }
            
@@ -189,7 +188,7 @@ struct LightItUpView: View {
         }
     }
    
-    // --- GAME LOGIC FUNCTIONS ---
+   
    
     func startGame() {
         score = 0
@@ -206,7 +205,7 @@ struct LightItUpView: View {
         cards = Array(repeating: Card(), count: currentLevel.cardCount)
     }
    
-    // Time ticks අනුව ලෙවල් මාරු කිරීම (0-15s L1, 15-30s L2, 30-45s L3, 45s+ L4)
+    
     func updateLevelProgression() {
         let elapsedTime = 60 - roundTimeRemaining
         var nextLevel = GameLevel.L1
@@ -219,13 +218,13 @@ struct LightItUpView: View {
             nextLevel = .L2
         }
        
-        // ලෙවල් එක මාරු වන විට Flash Effect එක සහ Grid එක අලුත් කිරීම
+       
         if nextLevel != currentLevel {
             currentLevel = nextLevel
             setupCards()
             startLitTimer()
            
-            // Level up Flash Animation
+            
             withAnimation(.easeOut(duration: 0.15)) {
                 showLevelUpFlash = true
             }
@@ -237,24 +236,24 @@ struct LightItUpView: View {
         }
     }
    
-    // Whack-a-Mole Logic: Randomly Light Up Cards
+    
     func startLitTimer() {
         stopLitTimer()
        
         litTimer = Timer.scheduledTimer(withTimeInterval: currentLevel.litDuration, repeats: true) { _ in
             guard isGameActive else { return }
            
-            // ඔක්කොම Dim කරන්න
+            
             for i in 0..<cards.count {
                 cards[i].isLit = false
             }
            
-            // Random කාඩ් එකක් පත්තු කරන්න
+            
             if !cards.isEmpty {
                 let randomIndex = Int.random(in: 0..<cards.count)
                 cards[randomIndex].isLit = true
                
-                // L4 වලදී කාඩ් 2ක් පත්තු කිරීම (Slide Requirement)
+                
                 if currentLevel == .L4 && cards.count > 1 {
                     var secondRandomIndex = Int.random(in: 0..<cards.count)
                     while secondRandomIndex == randomIndex {
@@ -271,21 +270,21 @@ struct LightItUpView: View {
         litTimer = nil
     }
    
-    // Tap Handle කිරීමේ Logic එක
+    
     func handleTap(at index: Int) {
         guard isGameActive else { return }
        
         if cards[index].isLit {
-            // Correct Tap!
+            
             score += 10
-            cards[index].isLit = false // Tap කරපු ගමන් නිවා දමන්න
+            cards[index].isLit = false
         } else {
-            // Wrong Tap: Live එකක් අඩු වේ (Penalty)
+            
             if lives > 1 {
                 lives -= 1
             } else {
                 lives = 0
-                endGame() // පණ තුනම ඉවර වුනොත් Game Over
+                endGame() 
             }
         }
     }
