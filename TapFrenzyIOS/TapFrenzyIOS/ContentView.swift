@@ -1,17 +1,27 @@
 import SwiftUI
 
 struct ContentView: View {
+    
     var body: some View {
+        
         NavigationStack {
+            
             ZStack {
-                                LinearGradient(gradient: Gradient(colors: [Color(.systemBackground), Color(.systemGroupedBackground)]),
-                               startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea()
+                LinearGradient(
+                    gradient: Gradient(
+                        colors: [Color(.systemBackground),
+                        Color(.systemGroupedBackground)]),
+                        startPoint: .top, endPoint: .bottom)
+                        .ignoresSafeArea()
                
                 VStack(spacing: 25) {
                     VStack(spacing: 8) {
-                        Text("LGAME STUDIO")
-                            .font(.system(size: 38, weight: .black, design: .rounded))
+                        Text("GAME STUDIO")
+                            .font(.system(
+                                size: 38,
+                                weight: .black,
+                                design: .rounded))
+                        
                             .foregroundColor(.primary)
                        
                         Text(" IOS Game Dashboard")
@@ -19,28 +29,45 @@ struct ContentView: View {
                             .foregroundColor(.secondary)
                             .fontWeight(.medium)
                     }
+                    
                     .padding(.top, 30)
                    
                     ScrollView(showsIndicators: false) {
+                        
                         VStack(spacing: 20) {
-                           
                             
                             NavigationLink(destination: TapFrenzyView()) {
-                                GameCardView(title: "Tap Frenzy", subtitle: "Speed Tap Challenge", icon: "hand.tap.fill", color: .orange, badge: "Task 1")
+                                GameCardView(
+                                    title: "Tap Frenzy",
+                                    subtitle: "Speed Tap Challenge",
+                                    icon: "hand.tap.fill",
+                                    color: .orange,
+                                    badge: "Task 1")
                             }
                            
                             
                             NavigationLink(destination: LightItUpView()) {
-                                GameCardView(title: "Light It Up", subtitle: "Memory & Logic Puzzle", icon: "lightbulb.fill", color: .blue, badge: "Task 2")
+                                GameCardView(
+                                    title: "Light It Up",
+                                    subtitle: "Memory & Logic Puzzle",
+                                    icon: "lightbulb.fill",
+                                    color: .blue,
+                                    badge: "Task 2")
                             }
                            
                             
                             NavigationLink(destination: QuizRushView()) {
-                                GameCardView(title: "Quiz Rush", subtitle: "Trivia Time Attack", icon: "timer", color: .purple, badge: "Task 3")
+                                GameCardView(
+                                    title: "Quiz Rush",
+                                    subtitle: "Trivia Time Attack",
+                                    icon: "timer",
+                                    color: .purple,
+                                    badge: "Task 3")
                             }
                            
                         }
                         .padding(.horizontal, 20)
+                        
                         .padding(.vertical, 10)
                     }
                    
