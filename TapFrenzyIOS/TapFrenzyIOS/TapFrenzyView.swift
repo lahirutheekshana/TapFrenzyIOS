@@ -1,0 +1,246 @@
+import SwiftUI
+import Combine
+
+struct TapFrenzyView: View {
+    // Game States
+    @State private var score = 0
+    @State private var timeRemaining = 10
+    @State private var isGameActive = false
+    @State private var isGameOver = false
+   
+    // Challenges Variables (Combo System & Shrinking Effect)
+    @State private var comboMultiplier = 1
+    @State private var lastTapTime = Date()
+    @State private var buttonScale: CGFloat = 1.0
+   
+    // Persist High Score using @AppStorage
+    @AppStorage("tapFrenzyHighScore") private var highScore = 0
+   
+    // Timer setting
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+   
+    var body: some View {
+        ZStack {
+            // Background Gradient
+            LinearGradient(gradient: Gradient(colors: [Color.orange.opacity(0.1), Color.red.opacity(0.15)]),
+                           startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
+           
+            VStack(spacing: 30) {
+                // Header Display (Score & High Score)
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("SCORE")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.secondary)
+                        Text("\(score)")
+                            .font(.system(size: 44, weight: .black, design: .rounded))
+                            .foregroundColor(.orange)
+                    }
+                   
+                    Spacer()
+                   
+                    VStack(alignment: .trailing) {
+                        Text("HIGH SCORE")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.secondary)
+                        Text("\(highScore)")
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundColor(.primary)
+                    }
+                }
+                .padding(.horizontal, 25)
+                .padding(.top, 20)
+               
+                // Timer & Combo Display
+                HStack(spacing: 40) {
+                    // Countdown Timer Display
+                    VStack {
+                        Text("TIME")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.secondary)
+                        Text("\(timeRemaining)s")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(timeRemaining <= 3 ? .red : .primary)
+                    }
+                    .padding()
+                    .frame(minWidth: 100)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .cornerRadius(15)
+                   
+                    // Combo Multiplier Display (Challenge 1)
+                    VStack {
+                        Text("COMBO")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.secondary)
+                        Text("x\(comboMultiplier)")
+                            .font(.title2)
+                            .fontWeight(.black)
+                            .foregroundColor(comboMultiplier > 1 ? .red : .gray)
+                    }
+                    .padding()
+                    .frame(minWidth: 100)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .cornerRadius(15)
+                }
+               
+                Spacer()
+               
+                // Main Interaction Area
+                if !isGameActive && !isGameOver {
+                    // Start Game Screen
+                    Button(action: startGame) {
+                        Text("START GAME")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(width: 220)
+                            .background(Color.orange.gradient)
+                            .cornerRadius(50)
+                            .shadow(color: .orange.opacity(0.4), radius: 10, x: 0, y: 5)
+                    }
+                } else if isGameOver {
+                    // Game Over View
+                    VStack(spacing: 20) {
+                        Text("💥 GAME OVER")
+                            .font(.system(size: 36, weight: .black, design: .rounded))
+                            .foregroundColor(.red)
+                       
+                        Text("Final Score: \(score)")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                       
+                        if score > highScore {
+                            Text("🎉 New High Score! 🎉")
+                                .font(.headline)
+                                .foregroundColor(.green)
+                                .transition(.scale)
+                        }
+                       
+                        Button(action: startGame) {
+                            HStack {
+                                Image(systemName: "arrow.clockwise")
+                                Text("Play Again")
+                            }
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(width: 200)
+                            .background(Color.primary)
+                            .cornerRadius(15)
+                        }
+                        .padding(.top, 10)
+                    }
+                    .padding(30)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .cornerRadius(25)
+                    .shadow(radius: 10)
+                    .onAppear(perform: updateHighScore)
+                } else {
+                    // The Big Tap Button (Challenge 2: Shrinking Button included)
+                    Button(action: handleTap) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.orange.gradient)
+                                .frame(width: 180, height: 180)
+                                .shadow(color: .orange.opacity(0.5), radius: 15, x: 0, y: 10)
+                           
+                            VStack(spacing: 4) {
+                                Text("TAP!")
+                                    .font(.system(size: 34, weight: .black, design: .rounded))
+                                    .foregroundColor(.white)
+                                Text("+\(comboMultiplier)")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                        }
+                    }
+                    // Time එක ඉවර වෙන්න ළඟ වෙද්දී බටන් එක කුඩා වෙනවා (Shrinking Button Challenge)
+                    .scaleEffect(buttonScale)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: buttonScale)
+                }
+               
+                Spacer()
+            }
+        }
+        .navigationTitle("Tap Frenzy")
+        .navigationBarTitleDisplayMode(.inline)
+        // Timer Logic Execution
+        .onReceive(timer) { _ in
+            guard isGameActive else { return }
+           
+            if timeRemaining > 0 {
+                timeRemaining -= 1
+               
+                // Challenge 2: කාලය අඩු වෙද්දී බටන් එකේ සයිස් එක ක්‍රමයෙන් කුඩා කිරීම
+                withAnimation {
+                    buttonScale = CGFloat(timeRemaining) / 10.0 * 0.4 + 0.6 // 1.0 සිට 0.6 දක්වා shrink වේ
+                }
+            } else {
+                // Time Up
+                isGameActive = false
+                isGameOver = true
+            }
+        }
+    }
+   
+    // --- GAME LOGIC FUNCTIONS ---
+   
+    // Game එක පටන් ගන්නා විට
+    func startGame() {
+        score = 0
+        timeRemaining = 10
+        comboMultiplier = 1
+        buttonScale = 1.0
+        isGameOver = false
+        isGameActive = true
+        lastTapTime = Date()
+    }
+   
+    // Button එක Tap කරන සෑම විටම
+    func handleTap() {
+        let now = Date()
+        let timeInterval = now.timeIntervalSince(lastTapTime)
+       
+        // Challenge 1: Combo System (තත්පර 0.5ක් ඇතුළත නැවත Tap කලොත් Multiplier එක වැඩි වේ)
+        if timeInterval < 0.5 {
+            if comboMultiplier < 5 { // උපරිම x5 වෙනකම් combo ලැබෙනවා
+                comboMultiplier += 1
+            }
+        } else {
+            comboMultiplier = 1 // පරක්කු වුනොත් Combo එක reset වෙනවා
+        }
+       
+        score += comboMultiplier
+        lastTapTime = now
+       
+        // Tap කරන විට පොඩි bounce animation එකක්
+        withAnimation(.easeInOut) {
+            buttonScale -= 0.05
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                buttonScale += 0.05
+            }
+        }
+    }
+   
+    // High score එක update කිරීම
+    func updateHighScore() {
+        if score > highScore {
+            highScore = score
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        TapFrenzyView()
+    }
+}
