@@ -6,7 +6,7 @@ struct QuizRushView: View {
     
     var body: some View {
         ZStack {
-            // Feedback Animation Background (Polish)
+           
             backgroundColorForFeedback()
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 0.3), value: viewModel.answerFeedback)
@@ -56,8 +56,7 @@ struct QuizRushView: View {
         }
     }
     
-    // MARK: - Game Over Screen
-    private func gameOverScreen() -> some View {
+        private func gameOverScreen() -> some View {
         VStack(spacing: 20) {
             Text("🎉 QUIZ COMPLETED")
                 .font(.title).fontWeight(.black).foregroundColor(.purple)
@@ -87,8 +86,7 @@ struct QuizRushView: View {
         }
     }
     
-    // MARK: - Active Quiz Screen
-    private func activeQuizScreen() -> some View {
+        private func activeQuizScreen() -> some View {
         let currentQuestion = viewModel.questions[viewModel.currentIndex]
         
         return ScrollView {
@@ -99,7 +97,7 @@ struct QuizRushView: View {
                         .fontWeight(.semibold).foregroundColor(.secondary)
                     Spacer()
                     if viewModel.streak >= 2 {
-                        Text("🔥 \(viewModel.streak) Streak")
+                        Text(" \(viewModel.streak) Streak")
                             .font(.caption).fontWeight(.bold).foregroundColor(.orange)
                             .padding(.horizontal, 8).padding(.vertical, 4)
                             .background(Color.orange.opacity(0.15)).cornerRadius(8)
@@ -111,7 +109,7 @@ struct QuizRushView: View {
                 .padding().background(Color(.secondarySystemGroupedBackground))
                 .cornerRadius(15).padding(.horizontal)
                 
-                // Question Box (රතු පාටින් ගැස්සෙන Animation එක - Shake Effect)
+                
                 VStack {
                     Text(currentQuestion.decodedQuestion)
                         .font(.title3).fontWeight(.bold).multilineTextAlignment(.center)
@@ -121,13 +119,13 @@ struct QuizRushView: View {
                         .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 5)
                 }
                 .padding(.horizontal)
-                .offset(x: viewModel.answerFeedback == .wrong ? -10 : 0) // Shake effect
+                .offset(x: viewModel.answerFeedback == .wrong ? -10 : 0)
                 .animation(viewModel.answerFeedback == .wrong ? .default.repeatCount(3).speed(3) : .default, value: viewModel.answerFeedback)
                 
-                // Answers — indices used as IDs so duplicate answer text never gets dropped by ForEach
+               
                 VStack(spacing: 14) {
                     if viewModel.shuffledAnswersForCurrentQuestion.isEmpty {
-                        // Fallback: answers haven't populated yet — self-heal instead of staying blank
+                        
                         VStack(spacing: 12) {
                             ProgressView()
                             Text("Loading answers…")
@@ -193,9 +191,9 @@ struct QuizRushView: View {
         }
     }
     
-    // MARK: - Polish Helper Functions
     
-    // Background Color for Green Flash / Red Background
+    
+    
     private func backgroundColorForFeedback() -> Color {
         switch viewModel.answerFeedback {
         case .correct: return Color.green.opacity(0.3)
@@ -209,18 +207,18 @@ struct QuizRushView: View {
         return answer == viewModel.questions[viewModel.currentIndex].correctAnswer.htmlDecoded
     }
     
-    // Button Color to show correct/wrong answer after tapping
+    
     private func buttonColor(for answer: String) -> Color {
         if viewModel.isAnswerLocked {
             if isCorrectAnswer(answer) {
-                // Always highlight the correct answer green once locked
+                
                 return Color.green.opacity(0.35)
             } else if answer == viewModel.selectedAnswer {
-                // Only highlight the answer the user actually tapped as wrong
+                
                 return Color.red.opacity(0.30)
             }
         }
-        // Default: use secondary grouped background but a bit less transparent to increase contrast
+        
         return Color(.secondarySystemBackground)
     }
 }
