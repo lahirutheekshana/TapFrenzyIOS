@@ -58,13 +58,13 @@ struct QuizRushView: View {
     
         private func gameOverScreen() -> some View {
         VStack(spacing: 20) {
-            Text("🎉 QUIZ COMPLETED")
+            Text("QUIZ COMPLETED")
                 .font(.title).fontWeight(.black).foregroundColor(.purple)
             Text("Final Score: \(viewModel.score)")
                 .font(.title2).fontWeight(.bold)
             
             if viewModel.score > highScore {
-                Text("👑 NEW HIGH SCORE! 👑")
+                Text(" NEW HIGH SCORE!")
                     .font(.headline).foregroundColor(.green)
             } else {
                 Text("High Score: \(highScore)")
@@ -91,7 +91,7 @@ struct QuizRushView: View {
         
         return ScrollView {
             VStack(spacing: 20) {
-                // Top Bar
+            
                 HStack {
                     Text("Q: \(viewModel.currentIndex + 1) / \(viewModel.questions.count)")
                         .fontWeight(.semibold).foregroundColor(.secondary)
