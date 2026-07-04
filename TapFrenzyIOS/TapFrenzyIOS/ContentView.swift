@@ -1,11 +1,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    
     var body: some View {
-        
         NavigationStack {
-            
             ZStack {
                 LinearGradient(
                     gradient: Gradient(
@@ -13,7 +10,7 @@ struct ContentView: View {
                         Color(.systemGroupedBackground)]),
                         startPoint: .top, endPoint: .bottom)
                         .ignoresSafeArea()
-               
+                
                 VStack(spacing: 25) {
                     VStack(spacing: 8) {
                         Text("GAME STUDIO")
@@ -21,20 +18,18 @@ struct ContentView: View {
                                 size: 38,
                                 weight: .black,
                                 design: .rounded))
-                        
                             .foregroundColor(.primary)
-                       
-                        Text(" IOS Game Dashboard")
+                        
+                        Text("iOS Game Dashboard")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .fontWeight(.medium)
                     }
-                    
                     .padding(.top, 30)
-                   
+                    
                     ScrollView(showsIndicators: false) {
-                        
                         VStack(spacing: 20) {
+                            
                             
                             NavigationLink(destination: TapFrenzyView()) {
                                 GameCardView(
@@ -44,7 +39,7 @@ struct ContentView: View {
                                     color: .orange,
                                     badge: "Task 1")
                             }
-                           
+                            
                             
                             NavigationLink(destination: LightItUpView()) {
                                 GameCardView(
@@ -54,7 +49,7 @@ struct ContentView: View {
                                     color: .blue,
                                     badge: "Task 2")
                             }
-                           
+                            
                             
                             NavigationLink(destination: QuizRushView()) {
                                 GameCardView(
@@ -64,13 +59,21 @@ struct ContentView: View {
                                     color: .purple,
                                     badge: "Task 3")
                             }
-                           
+                            
+                        
+                            NavigationLink(destination: HighScoreHistoryView()) {
+                                GameCardView(
+                                    title: "High Scores",
+                                    subtitle: "View your best records",
+                                    icon: "trophy.fill",
+                                    color: .yellow,
+                                    badge: "Stats")
+                            }
+                            
                         }
                         .padding(.horizontal, 20)
-                        
                         .padding(.vertical, 10)
                     }
-                   
                     Spacer()
                 }
             }
@@ -78,35 +81,35 @@ struct ContentView: View {
     }
 }
 
+
 struct GameCardView: View {
     let title: String
     let subtitle: String
     let icon: String
     let color: Color
     let badge: String
-   
+    
     var body: some View {
         HStack(spacing: 15) {
             ZStack {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(color.gradient)
                     .frame(width: 65, height: 65)
-               
+                
                 Image(systemName: icon)
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundColor(.white)
             }
-           
+            
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text(title)
                         .font(.title3)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
-                   
+                    
                     Spacer()
-                   
-                    // Week Badge
+                    
                     Text(badge)
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(color)
@@ -115,13 +118,13 @@ struct GameCardView: View {
                         .background(color.opacity(0.15))
                         .cornerRadius(8)
                 }
-               
+                
                 Text(subtitle)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .lineLimit(1)
             }
-           
+            
             Image(systemName: "chevron.right")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.secondary)
@@ -132,8 +135,4 @@ struct GameCardView: View {
         .cornerRadius(24)
         .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 6)
     }
-}
-
-#Preview {
-    ContentView()
 }
