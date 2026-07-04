@@ -30,7 +30,7 @@ struct ContentView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 20) {
                             
-                            
+                            // Game 1
                             NavigationLink(destination: TapFrenzyView()) {
                                 GameCardView(
                                     title: "Tap Frenzy",
@@ -40,7 +40,7 @@ struct ContentView: View {
                                     badge: "Task 1")
                             }
                             
-                            
+                            // Game 2
                             NavigationLink(destination: LightItUpView()) {
                                 GameCardView(
                                     title: "Light It Up",
@@ -50,7 +50,7 @@ struct ContentView: View {
                                     badge: "Task 2")
                             }
                             
-                            
+                            // Game 3
                             NavigationLink(destination: QuizRushView()) {
                                 GameCardView(
                                     title: "Quiz Rush",
@@ -60,28 +60,30 @@ struct ContentView: View {
                                     badge: "Task 3")
                             }
                             
-                        
-                            NavigationLink(destination: HighScoreHistoryView()) {
-                                GameCardView(
-                                    title: "High Scores",
-                                    subtitle: "View your best records",
-                                    icon: "trophy.fill",
-                                    color: .yellow,
-                                    badge: "Stats")
-                            }
-                            
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
                     }
+                    
                     Spacer()
+                }
+            }
+            // 🏆 මෙන්න මේ කොටසින් තමයි උඩ දකුණු කෙළවරට Trophy Icon එක එන්නේ
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: HighScoreHistoryView()) {
+                        Image(systemName: "trophy.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(.yellow)
+                            .shadow(color: .yellow.opacity(0.4), radius: 5, x: 0, y: 2)
+                    }
                 }
             }
         }
     }
 }
 
-
+// GameCardView එකේ කිසිම වෙනසක් නෑ
 struct GameCardView: View {
     let title: String
     let subtitle: String
@@ -135,4 +137,8 @@ struct GameCardView: View {
         .cornerRadius(24)
         .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 6)
     }
+}
+
+#Preview {
+    ContentView()
 }
