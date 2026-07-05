@@ -4,7 +4,7 @@ import SwiftUI
 struct TapFrenzyIOSApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
     }
 }

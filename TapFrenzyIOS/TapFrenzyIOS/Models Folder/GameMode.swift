@@ -1,7 +1,8 @@
-//
-//  GameMode.swift
-//  TapFrenzyIOS
-//
-//  Created by student1 on 2026-07-05.
-//
+import Foundation
 
+// ගේම් වර්ග 3 හඳුනාගැනීම සඳහා
+enum GameMode: String, Codable {
+    case tapFrenzy = "Tap Frenzy"
+    case lightItUp = "Light It Up"
+    case quizRush = "Quiz Rush"
+}
