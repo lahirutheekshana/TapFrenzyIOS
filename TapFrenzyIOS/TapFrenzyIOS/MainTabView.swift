@@ -10,7 +10,7 @@ struct MainTabView: View {
                 }
             
             // 2. Stats Tab
-            StatsTab(sessions: GameSessionManager.shared.loadSessions())
+            StatsTab()
                                
                 .tabItem {
                     Label("Stats", systemImage: "chart.bar")

@@ -1,39 +1,53 @@
 import Foundation
+import Combine
+import Charts
 
-// තනි ගේම් එකක දත්ත තබාගන්නා ව්‍යුහය (Codable වීම අනිවාර්යයි JSON කරන්න)
-struct GameSession: Identifiable, Codable {
+// 1. නම 'SessionGameMode' ලෙස වෙනස් කලා වෙනත් ඒවා එක්ක පැටලෙන්නේ නැති වෙන්න
+enum SessionGameMode: String, Codable, Plottable, CaseIterable {
+    case tapFrenzy = "Tap Frenzy"
+    case lightItUp = "Light It Up"
+    case quizRush = "Quiz Rush"
+}
+
+struct GameSession: Identifiable, Codable, Hashable {
     var id = UUID()
-    let mode: GameMode
+    let mode: SessionGameMode // මෙතනටත් අලුත් නම දුන්නා
     let score: Int
     let timestamp: Date
     let latitude: Double
     let longitude: Double
 }
 
-// UserDefaults හරහා දත්ත Save සහ Load කරන Class එක
-class GameSessionManager {
+class GameSessionManager: ObservableObject {
     static let shared = GameSessionManager()
     private let storageKey = "savedGameSessions"
     
-    // අලුත් ගේම් එකක් ඉවර වුනාම ඒ දත්ත Save කිරීම
+    @Published var sessions: [GameSession] = []
+    
+    init(){
+        self.sessions = loadSessions()
+    }
+    
     func saveSession(session: GameSession) {
         var allSessions = loadSessions()
         allSessions.append(session)
         
-        print("Saving session: \(session.score) points for \(session.mode)")
-        
-        // JSON විදියට Encode කරලා UserDefaults වල Save කිරීම
         if let encodedData = try? JSONEncoder().encode(allSessions) {
             UserDefaults.standard.set(encodedData, forKey: storageKey)
         }
+        self.sessions = allSessions
     }
     
-    // Save කරලා තියෙන දත්ත ඔක්කොම ආපහු Load කිරීම
     func loadSessions() -> [GameSession] {
         guard let data = UserDefaults.standard.data(forKey: storageKey),
               let decodedSessions = try? JSONDecoder().decode([GameSession].self, from: data) else {
             return []
         }
         return decodedSessions
+    }
+    
+    func resetSessions() {
+        UserDefaults.standard.removeObject(forKey: storageKey)
+        self.sessions = []
     }
 }

@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+internal import _LocationEssentials
 
 struct TapFrenzyView: View {
     
@@ -106,7 +107,7 @@ struct TapFrenzyView: View {
                 } else if isGameOver {
                     // Game Over View
                     VStack(spacing: 20) {
-                        Text("💥 GAME OVER")
+                        Text("GAME OVER")
                             .font(.system(size: 36, weight: .black, design: .rounded))
                             .foregroundColor(.red)
                        
@@ -123,7 +124,6 @@ struct TapFrenzyView: View {
                        
                         Button(action: startGame) {
                             HStack {
-                                Image(systemName: "arrow.clockwise")
                                 Text("Play Again")
                             }
                             .font(.headline)
@@ -141,7 +141,7 @@ struct TapFrenzyView: View {
                     .shadow(radius: 10)
                     .onAppear(perform: updateHighScore)
                 } else {
-                    // The Big Tap Button (Challenge 2: Shrinking Button included)
+                    
                     Button(action: handleTap) {
                         ZStack {
                             Circle()
@@ -170,7 +170,7 @@ struct TapFrenzyView: View {
         }
         .navigationTitle("Tap Frenzy")
         .navigationBarTitleDisplayMode(.inline)
-        // Timer Logic Execution
+        
         .onReceive(timer) { _ in
             guard isGameActive else { return }
            
@@ -182,14 +182,16 @@ struct TapFrenzyView: View {
                     buttonScale = CGFloat(timeRemaining) / 10.0 * 0.4 + 0.6
                 }
             } else {
-                // Time Up
                 isGameActive = false
                 isGameOver = true
+                let lat = LocationService.shared.currentLocation?.coordinate.latitude ?? 6.9271
+                let lon = LocationService.shared.currentLocation?.coordinate.longitude ?? 79.8612
+                let session = GameSession(mode: .tapFrenzy, score: score, timestamp: Date(), latitude: lat, longitude: lon)
+                GameSessionManager.shared.saveSession(session: session)
             }
         }
     }
    
-    // --- GAME LOGIC FUNCTIONS ---
    
     
     func startGame() {
@@ -202,7 +204,6 @@ struct TapFrenzyView: View {
         lastTapTime = Date()
     }
    
-
     func handleTap() {
         let now = Date()
         let timeInterval = now.timeIntervalSince(lastTapTime)

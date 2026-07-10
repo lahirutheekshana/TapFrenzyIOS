@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Combine
+internal import _LocationEssentials
 
 enum QuizState {
     case loading, loaded, failed
@@ -101,6 +102,10 @@ class QuizViewModel: ObservableObject {
             loadCurrentQuestionAnswers()
         } else {
             isQuizOver = true
+            let lat = LocationService.shared.currentLocation?.coordinate.latitude ?? 6.9271
+            let lon = LocationService.shared.currentLocation?.coordinate.longitude ?? 79.8612
+            let session = GameSession(mode: .quizRush, score: score, timestamp: Date(), latitude: lat, longitude: lon)
+            GameSessionManager.shared.saveSession(session: session)
         }
     }
 }

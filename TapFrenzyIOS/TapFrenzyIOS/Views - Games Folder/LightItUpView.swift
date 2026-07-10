@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+internal import _LocationEssentials
 
 struct LightItUpView: View {
     
@@ -67,7 +68,7 @@ struct LightItUpView: View {
                    
                     
                     VStack(alignment: .trailing) {
-                        Text("⏱️ \(roundTimeRemaining)s")
+                        Text("\(roundTimeRemaining)s")
                             .font(.title3)
                             .fontWeight(.bold)
                             .foregroundColor(roundTimeRemaining <= 10 ? .red : .primary)
@@ -89,9 +90,9 @@ struct LightItUpView: View {
                
                 Spacer()
                
-                // Content Switcher Area
+               
                 if !isGameActive && !isGameOver {
-                    // Start Button Screen
+                    
                     Button(action: startGame) {
                         Text("START GAME")
                             .font(.title3)
@@ -104,7 +105,7 @@ struct LightItUpView: View {
                             .shadow(radius: 5)
                     }
                 } else if isGameOver {
-                    // Game Over Screen
+                   
                     VStack(spacing: 15) {
                         Text("GAME OVER ")
                             .font(.title)
@@ -296,6 +297,10 @@ struct LightItUpView: View {
         if score > highScore {
             highScore = score
         }
+        let lat = LocationService.shared.currentLocation?.coordinate.latitude ?? 6.9271
+        let lon = LocationService.shared.currentLocation?.coordinate.longitude ?? 79.8612
+        let session = GameSession(mode: .lightItUp, score: score, timestamp: Date(), latitude: lat, longitude: lon)
+        GameSessionManager.shared.saveSession(session: session)
     }
 }
 

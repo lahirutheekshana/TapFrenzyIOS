@@ -1,12 +1,13 @@
 import Foundation
 import CoreLocation
-import Combine // මේක අනිවාර්යයෙන්ම import කරන්න
+import Combine
 
 class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
+    static let shared = LocationService()
     
     private let locationManager = CLLocationManager()
     
-    // @Published පාවිච්චි කරන නිසා ObservableObject එක හරියට වැඩ කරයි
+    
     @Published var currentLocation: CLLocation?
     
     override init() {
@@ -17,7 +18,7 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        // දත්ත UI එකට යවන්න main thread එක භාවිතා කරන්න
+    
         DispatchQueue.main.async {
             self.currentLocation = locations.last
         }
