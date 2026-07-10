@@ -2,9 +2,7 @@ import SwiftUI
 import Charts
 
 struct StatsTab: View {
-    // ඔයාගේ saved sessions මෙතනට Load වෙන්න ඕනේ
     let sessions: [GameSession]
-        
     
     var body: some View {
         NavigationStack {
@@ -13,19 +11,23 @@ struct StatsTab: View {
                     .font(.largeTitle)
                     .bold()
                 
-                // Chart එක මෙතනින් පටන් ගන්නවා
-                Chart {
-                    ForEach(sessions) { session in
-                        BarMark(
-                            x: .value("Game", session.timestamp, unit: .day),
-                            y: .value("Score", session.score)
-                        )
-                        .foregroundStyle(by: .value("Mode", session.mode.rawValue))
+                // දත්ත තියෙනවද බලමු
+                if sessions.isEmpty {
+                    Text("තවම ගේම් එකක් ප්ලේ කරලා නැහැ! 🎮")
+                        .padding()
+                } else {
+                    Chart {
+                        ForEach(sessions) { session in
+                            BarMark(
+                                x: .value("Date", session.timestamp, unit: .day),
+                                y: .value("Score", session.score)
+                            )
+                            .foregroundStyle(by: .value("Mode", session.mode.rawValue))
+                        }
                     }
+                    .frame(height: 300)
+                    .padding()
                 }
-                .frame(height: 300)
-                .padding()
-                
                 Spacer()
             }
             .navigationTitle("Stats")

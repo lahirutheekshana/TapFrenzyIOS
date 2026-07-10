@@ -51,9 +51,8 @@ struct TapFrenzyView: View {
                     }
                 }
                 .padding(.horizontal, 25)
-                .padding(.top, 20)
-               
-                // Timer & Combo Display
+                .padding(.top,
+                        UIApplication.shared.windows.first?.safeAreaInsets.top ?? 20)
                 HStack(spacing: 40) {
                     // Countdown Timer Display
                     VStack {

@@ -10,8 +10,8 @@ struct MainTabView: View {
                 }
             
             // 2. Stats Tab
-            StatsTab(sessions: []) // දැනට දත්ත නැත්නම් හිස් array එකක් දාන්න,
-                                   // නැත්නම් ඔයාගේ සැබෑ sessions array එක මෙතනට දෙන්න.
+            StatsTab(sessions: GameSessionManager.shared.loadSessions())
+                               
                 .tabItem {
                     Label("Stats", systemImage: "chart.bar")
                 }

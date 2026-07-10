@@ -20,6 +20,8 @@ class GameSessionManager {
         var allSessions = loadSessions()
         allSessions.append(session)
         
+        print("Saving session: \(session.score) points for \(session.mode)")
+        
         // JSON විදියට Encode කරලා UserDefaults වල Save කිරීම
         if let encodedData = try? JSONEncoder().encode(allSessions) {
             UserDefaults.standard.set(encodedData, forKey: storageKey)
