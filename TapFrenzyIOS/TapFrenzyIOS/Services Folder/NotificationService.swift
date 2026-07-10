@@ -50,7 +50,38 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
     }
     
+    func testNotification() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if !granted {
+                print("Cannot send test notification: Permission not granted.")
+                return
+            }
+            
+            let content = UNMutableNotificationContent()
+            content.title = "Test Notification"
+            content.body = "Notifications are working perfectly!"
+            content.sound = .default
+            
+            // Trigger in 5 seconds
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+            let request = UNNotificationRequest(identifier: "testReminder", content: content, trigger: trigger)
+            
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Test notification failed: \(error.localizedDescription)")
+                } else {
+                    print("Test notification scheduled to fire in 5 seconds")
+                }
+            }
+        }
+    }
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.banner, .sound, .badge])
+        print("willPresent delegate method called for: \(notification.request.identifier)")
+        if #available(iOS 14.0, *) {
+            completionHandler([.banner, .list, .sound, .badge])
+        } else {
+            completionHandler([.alert, .sound, .badge])
+        }
     }
 }

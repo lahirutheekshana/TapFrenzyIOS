@@ -122,18 +122,22 @@ struct TapFrenzyView: View {
                                 .transition(.scale)
                         }
                        
+                        ShareLink("Share Score", item: "I just scored \(score) on Tap Frenzy — beat that")
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.large)
+                        
                         Button(action: startGame) {
                             HStack {
                                 Text("Play Again")
                             }
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(UIColor.systemBackground))
                             .padding()
                             .frame(width: 200)
                             .background(Color.primary)
                             .cornerRadius(15)
                         }
-                        .padding(.top, 10)
+                        .padding(.top, 5)
                     }
                     .padding(30)
                     .background(Color(.secondarySystemGroupedBackground))

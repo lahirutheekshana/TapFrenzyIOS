@@ -122,10 +122,14 @@ struct LightItUpView: View {
                                 .foregroundColor(.green)
                         }
                        
+                        ShareLink("Share Score", item: "I just scored \(score) on Light It Up — beat that")
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.large)
+                            
                         Button(action: startGame) {
                             Text("Play Again")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(UIColor.systemBackground))
                                 .padding()
                                 .frame(width: 180)
                                 .background(Color.primary)

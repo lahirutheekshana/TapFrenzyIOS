@@ -65,14 +65,20 @@ struct StatsTab: View {
                                 
                                 VStack(alignment: .leading, spacing: 10) {
                                     if !modeSessions.isEmpty {
+                                        let recentModeSessions = Array(modeSessions.suffix(10))
                                         Chart {
-                                            ForEach(modeSessions) { session in
+                                            ForEach(Array(recentModeSessions.enumerated()), id: \.element.id) { index, session in
                                                 BarMark(
-                                                    x: .value("Date", session.timestamp, unit: .day),
+                                                    x: .value("Game", "G\(index + 1)"),
                                                     y: .value("Score", session.score)
                                                 )
-                                                .foregroundStyle(by: .value("Mode", session.mode))
-                                                .cornerRadius(4)
+                                                .foregroundStyle(Color.blue.gradient)
+                                                .cornerRadius(6)
+                                                .annotation(position: .top) {
+                                                    Text("\(session.score)")
+                                                        .font(.caption2)
+                                                        .foregroundColor(.secondary)
+                                                }
                                             }
                                         }
                                         .chartLegend(.hidden)

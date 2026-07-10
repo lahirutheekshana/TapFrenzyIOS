@@ -71,11 +71,15 @@ struct QuizRushView: View {
                     .font(.subheadline).foregroundColor(.secondary)
             }
             
+            ShareLink("Share Score", item: "I just scored \(viewModel.score) on Quiz Rush — beat that")
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                
             Button(action: {
                 Task { await viewModel.fetchQuestions() }
             }) {
                 Text("Play Again")
-                    .foregroundColor(.white).padding()
+                    .foregroundColor(Color(UIColor.systemBackground)).padding()
                     .frame(width: 180).background(Color.primary).cornerRadius(12)
             }
         }

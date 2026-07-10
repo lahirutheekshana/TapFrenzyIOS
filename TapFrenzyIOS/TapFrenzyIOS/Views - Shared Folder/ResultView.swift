@@ -14,17 +14,8 @@ struct ResultView: View {
                 .font(.title)
             
             
-            ShareLink(
-                item: "මම \(gameMode) ගේම් එකේදී ලකුණු \(score)ක් ලබා ගත්තා! ඔයාට පුළුවන්ද මේක පරද්දන්න? ",
-                subject: Text("My Score!"),
-                message: Text("Check out my score!")
-            ) {
-                Label("Share Score", systemImage: "square.and.arrow.up")
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
+            ShareLink("Share Score", item: "I just scored \(score) on \(gameMode) — beat that")
+                .buttonStyle(.borderedProminent)
         }
     }
 }

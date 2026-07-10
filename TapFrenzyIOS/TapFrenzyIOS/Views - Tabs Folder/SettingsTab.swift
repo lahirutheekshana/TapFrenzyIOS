@@ -25,6 +25,11 @@ struct SettingsTab: View {
                             .onChange(of: reminderTime) { oldValue, newValue in
                                 scheduleNotification()
                             }
+                            
+                        Button("Send Test Notification (5s)") {
+                            NotificationService.shared.testNotification()
+                        }
+                        .foregroundColor(.blue)
                     }
                 }
                 
