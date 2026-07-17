@@ -8,7 +8,7 @@ iOS games is a robust, multi game iOS application built purely in SwiftUI. It pr
   * **Tap Frenzy:** A fast paced tapping game that tests reaction speed.
   * **Light It Up:** A memory and reflex challenge involving a dynamic grid of lit cards.
   * **Quiz Rush:** A trivia game that fetches real time questions, requiring both speed and general knowledge.
-  * 
+    
 * **Global Dark Theme:** An enforced, sleek dark aesthetic UI applied globally across all game modes, menus, and views.
 * **Persistent Session Tracking:** Automatically tracks every finished game, permanently storing the score, exact timestamp, and the user's geographical location.
 * **Advanced Statistics Dashboard:** A dedicated tab featuring dynamic, distinct bar charts (`SwiftUI.Charts`) that cleanly visualize the last 10 game sessions for each individual game mode without unwanted data stacking.
