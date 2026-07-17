@@ -1,23 +1,23 @@
 #  iOS games
 
-iOS games is a robust, multi-game iOS application built purely in SwiftUI. It provides an engaging suite of mini games alongside comprehensive statistics tracking, interactive map plotting for played sessions, and a daily local notification system.
+iOS games is a robust, multi game iOS application built purely in SwiftUI. It provides an engaging suite of mini games alongside comprehensive statistics tracking, interactive map plotting for played sessions, and a daily local notification system.
 
 ## Features List
-* **Multi-Game Hub:** Includes three uniquely engaging mini-games:
+* **Multi Game Hub:** Includes three uniquely engaging mini games:
 * 
-  * **Tap Frenzy:** A fast-paced tapping game that tests reaction speed.
+  * **Tap Frenzy:** A fast paced tapping game that tests reaction speed.
   * **Light It Up:** A memory and reflex challenge involving a dynamic grid of lit cards.
-  * **Quiz Rush:** A trivia game that fetches real-time questions, requiring both speed and general knowledge.
+  * **Quiz Rush:** A trivia game that fetches real time questions, requiring both speed and general knowledge.
   * 
 * **Global Dark Theme:** An enforced, sleek dark aesthetic UI applied globally across all game modes, menus, and views.
 * **Persistent Session Tracking:** Automatically tracks every finished game, permanently storing the score, exact timestamp, and the user's geographical location.
 * **Advanced Statistics Dashboard:** A dedicated tab featuring dynamic, distinct bar charts (`SwiftUI.Charts`) that cleanly visualize the last 10 game sessions for each individual game mode without unwanted data stacking.
 * **Interactive Map Visualization:** Uses iOS 17 `MapKit` features to drop a single unified "Total Games" pin at the location of the most recent session. Tapping the pin smoothly opens an interactive bottom sheet containing organized, collapsible accordion lists of all past scores.
 * **Daily Challenge Reminders:** Leverages `UserNotifications` to let players set a specific time each day to receive local push notifications, encouraging them to beat their high scores.
-* **One-Click Sharing:** Includes a SwiftUI `ShareLink` integrated natively into the Game Over overlay, allowing players to instantly share their achievements via the iOS Share Sheet.
+* **One Click Sharing:** Includes a SwiftUI `ShareLink` integrated natively into the Game Over overlay, allowing players to instantly share their achievements via the iOS Share Sheet.
 
 ## Architecture Overview
-* **UI Framework:** 100% SwiftUI with a `TabView`-based routing system (`MainTabView`).
+* **UI Framework:** 100% SwiftUI with a `TabView` based routing system (`MainTabView`).
 * **State Management:** Utilizes the `@State`, `@StateObject`, and `@ObservedObject` property wrappers for reactive, localized view states.
 * **Data Persistence:** Relies on a Singleton pattern (`GameSessionManager.shared`) to encode/decode arrays of `GameSession` structs via `UserDefaults` for lightweight, persistent local storage. Persistent user settings and high scores are managed seamlessly via `@AppStorage`.
 * **Services:**
