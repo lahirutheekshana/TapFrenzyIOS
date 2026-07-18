@@ -26,7 +26,7 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         
         let content = UNMutableNotificationContent()
         content.title = "Daily Challenge!"
-        content.body = "අද ගේම් එකක් play කරලා ඔයාගේ score එක වැඩි කරගන්න!"
+        content.body = "Play a game today and boost your score!"
         content.sound = .default
         
         var dateComponents = DateComponents()

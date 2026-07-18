@@ -11,7 +11,7 @@ enum SessionGameMode: String, Codable, Plottable, CaseIterable {
 
 struct GameSession: Identifiable, Codable, Hashable {
     var id = UUID()
-    let mode: SessionGameMode // මෙතනටත් අලුත් නම දුන්නා
+    let mode: SessionGameMode 
     let score: Int
     let timestamp: Date
     let latitude: Double
