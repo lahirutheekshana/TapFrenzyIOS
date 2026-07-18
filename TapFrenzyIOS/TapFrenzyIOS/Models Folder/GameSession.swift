@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import Charts
 
-// 1. නම 'SessionGameMode' ලෙස වෙනස් කලා වෙනත් ඒවා එක්ක පැටලෙන්නේ නැති වෙන්න
+
 enum SessionGameMode: String, Codable, Plottable, CaseIterable {
     case tapFrenzy = "Tap Frenzy"
     case lightItUp = "Light It Up"
