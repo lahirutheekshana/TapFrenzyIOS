@@ -4,11 +4,30 @@ struct SettingsTab: View {
     
     @AppStorage("notificationsEnabled") var notificationsEnabled: Bool = false
     @AppStorage("reminderTime") var reminderTime: Date = Date()
+    @AppStorage("themeMode") private var themeMode: ThemeMode = .dark
+    @AppStorage("accentColor") private var accentColor: AppAccentColor = .blue
     @State private var showingResetConfirmation = false
     
     var body: some View {
         NavigationStack {
             Form {
+                Section(header: Text("Appearance")) {
+                    Picker("Theme", selection: $themeMode) {
+                        ForEach(ThemeMode.allCases) { mode in
+                            Text(mode.rawValue).tag(mode)
+                        }
+                    }
+                    
+                    Picker("Accent Color", selection: $accentColor) {
+                        ForEach(AppAccentColor.allCases) { color in
+                            HStack {
+                                Circle().fill(color.color).frame(width: 15, height: 15)
+                                Text(color.rawValue)
+                            }.tag(color)
+                        }
+                    }
+                }
+                
                 Section(header: Text("Notifications")) {
                     Toggle("Enable Notifications", isOn: $notificationsEnabled)
                         .onChange(of: notificationsEnabled) { oldValue, newValue in

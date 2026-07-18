@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct TapFrenzyIOSApp: App {
+    @AppStorage("themeMode") private var themeMode: ThemeMode = .dark
+    @AppStorage("accentColor") private var accentColor: AppAccentColor = .blue
     
     init() {
         _ = NotificationService.shared
@@ -10,7 +12,8 @@ struct TapFrenzyIOSApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(themeMode.colorScheme)
+                .tint(accentColor.color)
         }
     }
 }

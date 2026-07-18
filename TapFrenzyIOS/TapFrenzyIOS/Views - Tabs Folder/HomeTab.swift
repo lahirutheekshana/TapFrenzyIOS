@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct HomeTab: View {
+    @AppStorage("username") var username: String = "Player"
+    @AppStorage("userAvatar") var userAvatar: String = "person.crop.circle.fill"
+    @State private var showingProfile = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -13,12 +17,14 @@ struct HomeTab: View {
                 
                 VStack(spacing: 25) {
                     VStack(spacing: 8) {
-                        Text("GAME STUDIO")
+                        Text("HI \(username.uppercased())!")
                             .font(.system(
                                 size: 38,
                                 weight: .black,
                                 design: .rounded))
                             .foregroundColor(.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
                         
                         Text("iOS Game Dashboard")
                             .font(.subheadline)
@@ -68,22 +74,36 @@ struct HomeTab: View {
                     Spacer()
                 }
             }
-            // 🏆 මෙන්න මේ කොටසින් තමයි උඩ දකුණු කෙළවරට Trophy Icon එක එන්නේ
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: HighScoreHistoryView()) {
-                        Image(systemName: "trophy.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.yellow)
-                            .shadow(color: .yellow.opacity(0.4), radius: 5, x: 0, y: 2)
+                    HStack(spacing: 16) {
+                        Button(action: {
+                            showingProfile = true
+                        }) {
+                            Image(systemName: userAvatar)
+                                .font(.system(size: 28))
+                                .foregroundColor(.blue)
+                                .shadow(color: .blue.opacity(0.4), radius: 5, x: 0, y: 2)
+                        }
+                        
+                        NavigationLink(destination: HighScoreHistoryView()) {
+                            Image(systemName: "trophy.circle.fill")
+                                .font(.system(size: 28))
+                                .foregroundColor(.yellow)
+                                .shadow(color: .yellow.opacity(0.4), radius: 5, x: 0, y: 2)
+                        }
                     }
                 }
+            }
+            .sheet(isPresented: $showingProfile) {
+                ProfileView()
             }
         }
     }
 }
 
-// GameCardView එකේ කිසිම වෙනසක් නෑ
+
 struct GameCardView: View {
     let title: String
     let subtitle: String

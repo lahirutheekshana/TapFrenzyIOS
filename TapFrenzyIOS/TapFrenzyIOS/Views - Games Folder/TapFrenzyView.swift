@@ -8,11 +8,16 @@ struct TapFrenzyView: View {
     @State private var timeRemaining = 10
     @State private var isGameActive = false
     @State private var isGameOver = false
+    @State private var isCountingDown = false
+    @State private var countdownValue = 3
+    @State private var showGo = false
    
     
     @State private var comboMultiplier = 1
     @State private var lastTapTime = Date()
     @State private var buttonScale: CGFloat = 1.0
+    @State private var buttonColor: Color = .orange
+    @State private var buttonOffset: CGSize = .zero
    
         @AppStorage("tapFrenzyHighScore") private var highScore = 0
    
@@ -91,7 +96,25 @@ struct TapFrenzyView: View {
                 Spacer()
                
                 // Main Interaction Area
-                if !isGameActive && !isGameOver {
+                if isCountingDown {
+                    if showGo {
+                        Text("GO!")
+                            .font(.system(size: 120, weight: .black, design: .rounded))
+                            .foregroundColor(.green)
+                            .shadow(color: .green.opacity(0.8), radius: 20, x: 0, y: 10)
+                            .transition(.scale(scale: 2).combined(with: .opacity))
+                    } else {
+                        Text("\(countdownValue)")
+                            .font(.system(size: 150, weight: .black, design: .rounded))
+                            .foregroundColor(.orange)
+                            .shadow(color: .orange.opacity(0.8), radius: 20, x: 0, y: 10)
+                            .id(countdownValue)
+                            .transition(.asymmetric(
+                                insertion: .scale(scale: 1.5).combined(with: .opacity),
+                                removal: .scale(scale: 0.5).combined(with: .opacity)
+                            ))
+                    }
+                } else if !isGameActive && !isGameOver {
                     // Start Game Screen
                     Button(action: startGame) {
                         Text("START GAME")
@@ -149,9 +172,9 @@ struct TapFrenzyView: View {
                     Button(action: handleTap) {
                         ZStack {
                             Circle()
-                                .fill(Color.orange.gradient)
+                                .fill(buttonColor.gradient)
                                 .frame(width: 180, height: 180)
-                                .shadow(color: .orange.opacity(0.5), radius: 15, x: 0, y: 10)
+                                .shadow(color: buttonColor.opacity(0.5), radius: 15, x: 0, y: 10)
                            
                             VStack(spacing: 4) {
                                 Text("TAP!")
@@ -164,9 +187,11 @@ struct TapFrenzyView: View {
                             }
                         }
                     }
-                   
+                    .offset(buttonOffset)
                     .scaleEffect(buttonScale)
                     .animation(.spring(response: 0.3, dampingFraction: 0.5), value: buttonScale)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: buttonOffset)
+                    .animation(.easeInOut(duration: 0.2), value: buttonColor)
                 }
                
                 Spacer()
@@ -188,6 +213,10 @@ struct TapFrenzyView: View {
             } else {
                 isGameActive = false
                 isGameOver = true
+                
+                AudioHapticManager.shared.playNotificationHaptic(type: .warning)
+                AudioHapticManager.shared.playGameOverSound()
+                
                 let lat = LocationService.shared.currentLocation?.coordinate.latitude ?? 6.9271
                 let lon = LocationService.shared.currentLocation?.coordinate.longitude ?? 79.8612
                 let session = GameSession(mode: .tapFrenzy, score: score, timestamp: Date(), latitude: lat, longitude: lon)
@@ -199,18 +228,64 @@ struct TapFrenzyView: View {
    
     
     func startGame() {
-        score = 0
-        timeRemaining = 10
-        comboMultiplier = 1
-        buttonScale = 1.0
-        isGameOver = false
-        isGameActive = true
-        lastTapTime = Date()
+        AudioHapticManager.shared.playTapHaptic(style: .medium)
+        
+        withAnimation {
+            isGameOver = false
+            isCountingDown = true
+            countdownValue = 3
+            showGo = false
+        }
+        
+        startCountdown()
+    }
+    
+    func startCountdown() {
+        if countdownValue > 1 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                AudioHapticManager.shared.playTapSound()
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                    countdownValue -= 1
+                }
+                startCountdown()
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                AudioHapticManager.shared.playSuccessSound()
+                AudioHapticManager.shared.playTapHaptic(style: .heavy)
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
+                    showGo = true
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    withAnimation {
+                        isCountingDown = false
+                        showGo = false
+                        
+                        score = 0
+                        timeRemaining = 10
+                        comboMultiplier = 1
+                        buttonScale = 1.0
+                        buttonColor = .orange
+                        buttonOffset = .zero
+                        isGameActive = true
+                        lastTapTime = Date()
+                    }
+                }
+            }
+        }
     }
    
     func handleTap() {
         let now = Date()
         let timeInterval = now.timeIntervalSince(lastTapTime)
+        
+        AudioHapticManager.shared.playTapSound()
+        if comboMultiplier >= 4 {
+            AudioHapticManager.shared.playTapHaptic(style: .heavy)
+        } else {
+            AudioHapticManager.shared.playTapHaptic(style: .medium)
+        }
        
         if timeInterval < 0.5 {
             if comboMultiplier < 5 {
@@ -223,6 +298,12 @@ struct TapFrenzyView: View {
         score += comboMultiplier
         lastTapTime = now
        
+        let colors: [Color] = [.orange, .red, .blue, .green, .purple, .pink, .yellow, .cyan]
+        buttonColor = colors.randomElement() ?? .orange
+        
+        let randomX = CGFloat.random(in: -100...100)
+        let randomY = CGFloat.random(in: -150...150)
+        buttonOffset = CGSize(width: randomX, height: randomY)
         
         withAnimation(.easeInOut) {
             buttonScale -= 0.05

@@ -4,6 +4,12 @@ struct QuizRushView: View {
     @StateObject private var viewModel = QuizViewModel()
     @AppStorage("quizRushHighScore") private var highScore = 0
     
+    // Countdown state
+    @State private var isCountingDown = false
+    @State private var countdownValue = 3
+    @State private var showGo = false
+    @State private var quizStarted = false
+    
     var body: some View {
         ZStack {
            
@@ -43,9 +49,36 @@ struct QuizRushView: View {
                 case .loaded:
                     if viewModel.isQuizOver {
                         gameOverScreen()
+                    } else if !quizStarted && !isCountingDown {
+                        // Ready screen — questions loaded, waiting to start
+                        readyScreen()
                     } else {
                         activeQuizScreen()
                     }
+                }
+            }
+            
+            // Countdown overlay
+            if isCountingDown {
+                Color.black.opacity(0.6)
+                    .ignoresSafeArea()
+                
+                if showGo {
+                    Text("GO!")
+                        .font(.system(size: 120, weight: .black, design: .rounded))
+                        .foregroundColor(.green)
+                        .shadow(color: .green.opacity(0.8), radius: 20, x: 0, y: 10)
+                        .transition(.scale(scale: 2).combined(with: .opacity))
+                } else {
+                    Text("\(countdownValue)")
+                        .font(.system(size: 150, weight: .black, design: .rounded))
+                        .foregroundColor(.purple)
+                        .shadow(color: .purple.opacity(0.8), radius: 20, x: 0, y: 10)
+                        .id(countdownValue)
+                        .transition(.asymmetric(
+                            insertion: .scale(scale: 1.5).combined(with: .opacity),
+                            removal: .scale(scale: 0.5).combined(with: .opacity)
+                        ))
                 }
             }
         }
@@ -56,7 +89,109 @@ struct QuizRushView: View {
         }
     }
     
-        private func gameOverScreen() -> some View {
+    // MARK: - Ready Screen
+    private func readyScreen() -> some View {
+        let quizSessions = GameSessionManager.shared.sessions.filter { $0.mode == .quizRush }
+        let totalPlayed = quizSessions.count
+        let bestScore = quizSessions.map(\.score).max() ?? highScore
+        
+        return VStack(spacing: 20) {
+            // Stats cards row
+            HStack(spacing: 14) {
+                // Card 1: Total Games
+                VStack(spacing: 10) {
+                    Image(systemName: "gamecontroller.fill")
+                        .font(.system(size: 28))
+                        .foregroundColor(.white.opacity(0.9))
+                    
+                    Text("\(totalPlayed)")
+                        .font(.system(size: 38, weight: .black, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    Text("Games Played")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white.opacity(0.85))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(
+                    LinearGradient(
+                        colors: [Color(red: 0.55, green: 0.23, blue: 0.9),
+                                 Color(red: 0.35, green: 0.1, blue: 0.75)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .cornerRadius(20)
+                .shadow(color: Color.purple.opacity(0.35), radius: 8, x: 0, y: 4)
+                
+                // Card 2: Highest Score
+                VStack(spacing: 10) {
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 28))
+                        .foregroundColor(.white.opacity(0.9))
+                    
+                    Text("\(bestScore)")
+                        .font(.system(size: 38, weight: .black, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    Text("Best Score")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white.opacity(0.85))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(
+                    LinearGradient(
+                        colors: [Color(red: 0.95, green: 0.5, blue: 0.1),
+                                 Color(red: 0.85, green: 0.25, blue: 0.15)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .cornerRadius(20)
+                .shadow(color: Color.orange.opacity(0.35), radius: 8, x: 0, y: 4)
+            }
+            .padding(.horizontal)
+            
+            // Questions ready badge
+            HStack(spacing: 8) {
+                Image(systemName: "brain.head.profile")
+                    .font(.title3)
+                    .foregroundColor(.purple)
+                Text("\(viewModel.questions.count) Questions Ready")
+                    .font(.headline).fontWeight(.bold)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(15)
+            
+            // Subtitle
+            Text("Test your trivia knowledge!")
+                .font(.subheadline).foregroundColor(.secondary)
+            
+            // Start button
+            Button(action: startCountdownSequence) {
+                Text("START QUIZ")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(width: 220)
+                    .background(Color.purple.gradient)
+                    .cornerRadius(50)
+                    .shadow(color: .purple.opacity(0.4), radius: 10, x: 0, y: 5)
+            }
+        }
+        .padding(.vertical, 25)
+
+    }
+    
+    // MARK: - Game Over Screen
+    private func gameOverScreen() -> some View {
         VStack(spacing: 20) {
             Text("QUIZ COMPLETED")
                 .font(.title).fontWeight(.black).foregroundColor(.purple)
@@ -76,7 +211,10 @@ struct QuizRushView: View {
                 .controlSize(.large)
                 
             Button(action: {
-                Task { await viewModel.fetchQuestions() }
+                Task {
+                    quizStarted = false
+                    await viewModel.fetchQuestions()
+                }
             }) {
                 Text("Play Again")
                     .foregroundColor(Color(UIColor.systemBackground)).padding()
@@ -90,7 +228,8 @@ struct QuizRushView: View {
         }
     }
     
-        private func activeQuizScreen() -> some View {
+    // MARK: - Active Quiz Screen
+    private func activeQuizScreen() -> some View {
         let currentQuestion = viewModel.questions[viewModel.currentIndex]
         
         return ScrollView {
@@ -195,8 +334,49 @@ struct QuizRushView: View {
         }
     }
     
+    // MARK: - Countdown Logic
     
+    func startCountdownSequence() {
+        AudioHapticManager.shared.playTapHaptic(style: .medium)
+        
+        withAnimation {
+            isCountingDown = true
+            countdownValue = 3
+            showGo = false
+        }
+        
+        startCountdown()
+    }
     
+    func startCountdown() {
+        if countdownValue > 1 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                AudioHapticManager.shared.playTapSound()
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                    countdownValue -= 1
+                }
+                startCountdown()
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                AudioHapticManager.shared.playSuccessSound()
+                AudioHapticManager.shared.playTapHaptic(style: .heavy)
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
+                    showGo = true
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    withAnimation {
+                        isCountingDown = false
+                        showGo = false
+                        quizStarted = true
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Helpers
     
     private func backgroundColorForFeedback() -> Color {
         switch viewModel.answerFeedback {
@@ -226,4 +406,3 @@ struct QuizRushView: View {
         return Color(.secondarySystemBackground)
     }
 }
-

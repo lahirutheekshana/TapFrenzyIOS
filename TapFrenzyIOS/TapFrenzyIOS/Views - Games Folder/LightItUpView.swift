@@ -11,6 +11,9 @@ struct LightItUpView: View {
     @State private var roundTimeRemaining = 60
     @State private var isGameActive = false
     @State private var isGameOver = false
+    @State private var isCountingDown = false
+    @State private var countdownValue = 3
+    @State private var showGo = false
    
    
     @State private var showLevelUpFlash = false
@@ -91,7 +94,25 @@ struct LightItUpView: View {
                 Spacer()
                
                
-                if !isGameActive && !isGameOver {
+                if isCountingDown {
+                    if showGo {
+                        Text("GO!")
+                            .font(.system(size: 120, weight: .black, design: .rounded))
+                            .foregroundColor(.green)
+                            .shadow(color: .green.opacity(0.8), radius: 20, x: 0, y: 10)
+                            .transition(.scale(scale: 2).combined(with: .opacity))
+                    } else {
+                        Text("\(countdownValue)")
+                            .font(.system(size: 150, weight: .black, design: .rounded))
+                            .foregroundColor(.orange)
+                            .shadow(color: .orange.opacity(0.8), radius: 20, x: 0, y: 10)
+                            .id(countdownValue)
+                            .transition(.asymmetric(
+                                insertion: .scale(scale: 1.5).combined(with: .opacity),
+                                removal: .scale(scale: 0.5).combined(with: .opacity)
+                            ))
+                    }
+                } else if !isGameActive && !isGameOver {
                     
                     Button(action: startGame) {
                         Text("START GAME")
@@ -196,14 +217,51 @@ struct LightItUpView: View {
    
    
     func startGame() {
-        score = 0
-        lives = 3
-        currentLevel = .L1
-        roundTimeRemaining = 60
-        isGameOver = false
-        setupCards()
-        isGameActive = true
-        startLitTimer()
+        AudioHapticManager.shared.playTapHaptic(style: .medium)
+        
+        withAnimation {
+            isGameOver = false
+            isCountingDown = true
+            countdownValue = 3
+            showGo = false
+        }
+        
+        startCountdown()
+    }
+    
+    func startCountdown() {
+        if countdownValue > 1 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                AudioHapticManager.shared.playTapSound()
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                    countdownValue -= 1
+                }
+                startCountdown()
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                AudioHapticManager.shared.playSuccessSound()
+                AudioHapticManager.shared.playTapHaptic(style: .heavy)
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
+                    showGo = true
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    withAnimation {
+                        isCountingDown = false
+                        showGo = false
+                        
+                        score = 0
+                        lives = 3
+                        currentLevel = .L1
+                        roundTimeRemaining = 60
+                        setupCards()
+                        isGameActive = true
+                        startLitTimer()
+                    }
+                }
+            }
+        }
     }
    
     func setupCards() {
@@ -295,6 +353,9 @@ struct LightItUpView: View {
     }
    
     func endGame() {
+        AudioHapticManager.shared.playNotificationHaptic(type: .warning)
+        AudioHapticManager.shared.playGameOverSound()
+        
         isGameActive = false
         isGameOver = true
         stopLitTimer()
